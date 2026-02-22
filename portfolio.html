@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veera Karthick</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+:root {
+  --bg:      #0c0e0d;
+  --surface: #131614;
+  --card:    #161a18;
+  --border:  #1f2520;
+  --green:   #3ddc84;
+  --green-lo: rgba(61,220,132,0.08);
+  --green-mid: rgba(61,220,132,0.18);
+  --text:    #cfe0d4;
+  --sub:     #5a7264;
+  --white:   #eef5f0;
+  --mono:    'JetBrains Mono', monospace;
+  --serif:   'Instrument Serif', serif;
+  --sans:    'Syne', sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ─ cursor ─ */
+#c {
+  position: fixed; width: 8px; height: 8px;
+  background: var(--green); border-radius: 50%;
+  pointer-events: none; z-index: 9000;
+  transform: translate(-50%,-50%);
+  transition: transform .1s;
+  mix-blend-mode: screen;
+}
+#cr {
+  position: fixed; width: 36px; height: 36px;
+  border: 1px solid rgba(61,220,132,.35);
+  border-radius: 50%;
+  pointer-events: none; z-index: 8999;
+  transform: translate(-50%,-50%);
+}
+
+/* ─ nav ─ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.4rem 3rem;
+  background: rgba(12,14,13,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: var(--mono); font-size: .78rem;
+  color: var(--green); letter-spacing: .05em;
+}
+.nav-logo em { color: var(--sub); font-style: normal; }
+.nav-links { display: flex; gap: 2.5rem; list-style: none; }
+.nav-links a {
+  font-family: var(--mono); font-size: .68rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--sub); text-decoration: none;
+  transition: color .25s;
+}
+.nav-links a:hover { color: var(--green); }
+.nav-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ─ hero ─ */
+#hero {
+  min-height: 100vh;
+  display: flex; align-items: center;
+  padding: 100px 3rem 4rem;
+  position: relative; overflow: hidden;
+}
+
+.hero-bg-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 72px 72px;
+  opacity: .4;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+}
+
+.hero-glow {
+  position: absolute; width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(61,220,132,.06) 0%, transparent 65%);
+  top: 50%; right: -100px; transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.hero-inner { max-width: 1060px; margin: 0 auto; width: 100%; position: relative; z-index: 2; }
+
+.hero-tag {
+  font-family: var(--mono); font-size: .7rem; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--green);
+  margin-bottom: 2rem;
+  opacity: 0; animation: up .7s ease .1s forwards;
+}
+
+.hero-name {
+  font-family: var(--serif);
+  font-size: clamp(4.5rem, 10vw, 9.5rem);
+  font-weight: 400; line-height: .95; letter-spacing: -.02em;
+  color: var(--white);
+  opacity: 0; animation: up .8s ease .25s forwards;
+}
+.hero-name i { color: transparent; -webkit-text-stroke: 1px rgba(238,245,240,.25); font-style: italic; }
+
+.hero-desc {
+  margin-top: 2.5rem; max-width: 480px;
+  font-family: var(--mono); font-size: .82rem; line-height: 1.85;
+  color: var(--sub);
+  opacity: 0; animation: up .7s ease .45s forwards;
+}
+
+.hero-actions {
+  margin-top: 3rem; display: flex; gap: 1rem; flex-wrap: wrap;
+  opacity: 0; animation: up .7s ease .6s forwards;
+}
+.btn {
+  font-family: var(--mono); font-size: .7rem; letter-spacing: .1em;
+  text-transform: uppercase; text-decoration: none; padding: .75rem 1.75rem;
+  transition: all .25s; cursor: none; border: none;
+}
+.btn-fill { background: var(--green); color: #000; font-weight: 500; }
+.btn-fill:hover { background: var(--white); box-shadow: 0 0 18px rgba(61,220,132,.3); }
+.btn-ghost { border: 1px solid var(--border); color: var(--sub); background: transparent; }
+.btn-ghost:hover { border-color: var(--green); color: var(--green); background: var(--green-lo); }
+
+.hero-scroll-hint {
+  position: absolute; bottom: 2.5rem; left: 3rem;
+  font-family: var(--mono); font-size: .6rem; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--border);
+  display: flex; align-items: center; gap: .8rem;
+  animation: fadeIn 1s ease 1.2s both;
+}
+.hero-scroll-hint::before { content: ''; display: block; width: 30px; height: 1px; background: var(--border); }
+
+@keyframes up { from { opacity:0; transform: translateY(28px); } to { opacity:1; transform:none; } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+/* ─ section base ─ */
+.sec { padding: 7rem 3rem; }
+.sec-inner { max-width: 1060px; margin: 0 auto; }
+
+.sec-label {
+  font-family: var(--mono); font-size: .62rem; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--green);
+  margin-bottom: 3.5rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.sec-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ─ scroll reveal ─ */
+.r  { opacity:0; transform: translateY(32px); transition: opacity .75s cubic-bezier(.4,0,.2,1), transform .75s cubic-bezier(.4,0,.2,1); }
+.rl { opacity:0; transform: translateX(-36px); transition: opacity .75s cubic-bezier(.4,0,.2,1), transform .75s cubic-bezier(.4,0,.2,1); }
+.rr { opacity:0; transform: translateX(36px);  transition: opacity .75s cubic-bezier(.4,0,.2,1), transform .75s cubic-bezier(.4,0,.2,1); }
+.r.v, .rl.v, .rr.v { opacity:1; transform: none; }
+
+/* ─ about ─ */
+#about { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: start; }
+
+.about-code {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; overflow: hidden;
+  font-family: var(--mono); font-size: .75rem; line-height: 2;
+}
+.code-bar {
+  background: #1a1e1c; padding: .55rem 1rem;
+  display: flex; align-items: center; gap: .45rem;
+  border-bottom: 1px solid var(--border);
+}
+.cb-dot { width: 9px; height: 9px; border-radius: 50%; }
+.code-body { padding: 1.5rem 1.8rem; }
+.cl { display: block; }
+.ck  { color: #b08dff; }   /* keyword  */
+.cs  { color: #3ddc84; }   /* string   */
+.cn  { color: #f7c948; }   /* number   */
+.cc  { color: #3a4e40; font-style: italic; } /* comment */
+.cx  { color: var(--text); }  /* default  */
+
+.about-text {
+  display: flex; flex-direction: column; gap: 2rem; justify-content: center; height: 100%;
+}
+.about-para {
+  font-size: 1rem; line-height: 1.85; color: var(--sub); font-weight: 400;
+}
+.about-para strong { color: var(--text); font-weight: 700; }
+
+/* ─ experience ─ */
+.exp-list { display: flex; flex-direction: column; }
+.exp-row {
+  display: grid; grid-template-columns: 180px 1fr;
+  gap: 3rem; padding: 2.5rem 0;
+  border-bottom: 1px solid var(--border);
+  transition: background .3s;
+}
+.exp-row:last-child { border-bottom: none; }
+
+.exp-time { font-family: var(--mono); font-size: .65rem; letter-spacing: .08em; color: var(--sub); line-height: 1.7; padding-top: .3rem; }
+.exp-time span { display: block; color: var(--green); margin-bottom: .2rem; }
+
+.exp-main {}
+.exp-title { font-size: 1.45rem; font-weight: 700; letter-spacing: -.01em; margin-bottom: .25rem; }
+.exp-co { font-family: var(--mono); font-size: .72rem; color: var(--sub); margin-bottom: 1.2rem; }
+.exp-pts { display: flex; flex-direction: column; gap: .55rem; }
+.exp-pt {
+  font-size: .85rem; color: var(--sub); line-height: 1.65;
+  padding-left: 1.1rem; position: relative;
+}
+.exp-pt::before { content: '—'; position: absolute; left: 0; color: var(--green); }
+
+/* ─ projects ─ */
+#projects { background: var(--surface); }
+
+.proj-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border); }
+
+.proj-card {
+  background: var(--surface); padding: 2.5rem;
+  position: relative; overflow: hidden;
+  transition: background .3s;
+}
+.proj-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, var(--green), transparent);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .4s ease;
+}
+.proj-card:hover { background: var(--card); }
+.proj-card:hover::after { transform: scaleX(1); }
+
+.pc-num { font-family: var(--mono); font-size: .58rem; letter-spacing: .18em; color: var(--sub); margin-bottom: 1.2rem; }
+.pc-name { font-size: 1.35rem; font-weight: 700; margin-bottom: .9rem; letter-spacing: -.01em; transition: color .3s; }
+.proj-card:hover .pc-name { color: var(--green); }
+.pc-desc { font-size: .83rem; color: var(--sub); line-height: 1.75; margin-bottom: 1.8rem; }
+.pc-footer { display: flex; justify-content: space-between; align-items: center; }
+.pc-tags { display: flex; gap: .4rem; flex-wrap: wrap; }
+.pc-tag { font-family: var(--mono); font-size: .58rem; color: var(--sub); border: 1px solid var(--border); padding: .18rem .55rem; }
+.pc-link {
+  font-family: var(--mono); font-size: .62rem; letter-spacing: .08em;
+  color: var(--green); text-decoration: none;
+  opacity: .6; transition: opacity .25s;
+}
+.pc-link:hover { opacity: 1; }
+
+/* ─ skills ─ */
+.skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
+
+.skill-block { margin-bottom: 2rem; }
+.sb-cat { font-family: var(--mono); font-size: .6rem; letter-spacing: .2em; text-transform: uppercase; color: var(--green); margin-bottom: .9rem; }
+.sb-pills { display: flex; flex-wrap: wrap; gap: .4rem; }
+.sb-pill {
+  font-family: var(--mono); font-size: .7rem; color: var(--sub);
+  background: var(--card); border: 1px solid var(--border);
+  padding: .32rem .85rem; transition: all .22s;
+}
+.sb-pill:hover { color: var(--green); border-color: rgba(61,220,132,.3); }
+
+/* bars */
+.bars { display: flex; flex-direction: column; gap: 1.4rem; }
+.bar-row {}
+.bar-head { display: flex; justify-content: space-between; margin-bottom: .45rem; }
+.bar-name { font-family: var(--mono); font-size: .7rem; color: var(--text); }
+.bar-val  { font-family: var(--mono); font-size: .62rem; color: var(--sub); }
+.bar-track { height: 1px; background: var(--border); }
+.bar-fill { height: 1px; width: 0; background: var(--green); box-shadow: 0 0 6px rgba(61,220,132,.4); transition: width 1.4s cubic-bezier(.4,0,.2,1); }
+
+/* ─ contact ─ */
+#contact { background: var(--surface); border-top: 1px solid var(--border); }
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: start; }
+
+.contact-heading {
+  font-family: var(--serif);
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  font-weight: 400; line-height: 1.05; letter-spacing: -.02em;
+  color: var(--white); margin-bottom: 1.5rem;
+}
+.contact-heading em { color: var(--green); font-style: italic; }
+
+.contact-note { font-size: .85rem; color: var(--sub); line-height: 1.8; margin-bottom: 2.5rem; }
+.contact-items { display: flex; flex-direction: column; gap: .6rem; }
+.ci {
+  display: flex; align-items: center; gap: .9rem;
+  font-family: var(--mono); font-size: .72rem; color: var(--sub);
+  text-decoration: none; padding: .65rem .9rem;
+  border: 1px solid var(--border);
+  transition: all .25s;
+}
+.ci:hover { border-color: rgba(61,220,132,.3); color: var(--green); background: var(--green-lo); }
+.ci svg { width: 13px; height: 13px; color: var(--green); flex-shrink: 0; }
+
+.form { display: flex; flex-direction: column; gap: .9rem; }
+.fg { display: flex; flex-direction: column; gap: .3rem; }
+.fl { font-family: var(--mono); font-size: .58rem; letter-spacing: .18em; text-transform: uppercase; color: var(--green); }
+.fi, .ft {
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--text); font-family: var(--mono); font-size: .75rem;
+  padding: .7rem .9rem; outline: none;
+  transition: border-color .25s;
+}
+.fi:focus, .ft:focus { border-color: rgba(61,220,132,.4); }
+.ft { resize: vertical; min-height: 100px; }
+.fsub {
+  font-family: var(--mono); font-size: .68rem; letter-spacing: .1em;
+  text-transform: uppercase; padding: .8rem 1.8rem;
+  background: var(--green); color: #000; font-weight: 500;
+  border: none; cursor: none; align-self: flex-start;
+  transition: background .25s;
+}
+.fsub:hover { background: var(--white); }
+
+/* ─ footer ─ */
+footer {
+  background: var(--bg); border-top: 1px solid var(--border);
+  padding: 1.4rem 3rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+footer p { font-family: var(--mono); font-size: .6rem; color: var(--sub); }
+footer span { color: var(--green); }
+
+/* ─ scrollbar ─ */
+::-webkit-scrollbar { width: 2px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--green); }
+
+/* ─ responsive ─ */
+@media (max-width: 860px) {
+  nav { padding: 1rem 1.5rem; }
+  .nav-links { display: none; }
+  #hero, .sec { padding-left: 1.5rem; padding-right: 1.5rem; }
+  .about-grid, .skills-grid, .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
+  .proj-grid { grid-template-columns: 1fr; }
+  .exp-row { grid-template-columns: 1fr; gap: 1rem; }
+  .hero-name { font-size: clamp(3.5rem, 13vw, 9rem); }
+  footer { flex-direction: column; gap: .5rem; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<div id="c"></div>
+<div id="cr"></div>
+
+<nav>
+  <div class="nav-logo">veera<em>@</em>karthick</div>
+  <ul class="nav-links">
+    <li><a href="#about">about</a></li>
+    <li><a href="#experience">experience</a></li>
+    <li><a href="#projects">projects</a></li>
+    <li><a href="#skills">skills</a></li>
+    <li><a href="#contact">contact</a></li>
+  </ul>
+  <div class="nav-dot"></div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-tag">AI Engineer · Chennai, India</div>
+    <h1 class="hero-name">Veera<br><i>Karthick</i></h1>
+    <p class="hero-desc">
+      Building production-grade AI systems —<br>
+      RAG pipelines, async inference servers,<br>
+      and backends that scale.
+    </p>
+    <div class="hero-actions">
+      <a href="#projects" class="btn btn-fill">Projects</a>
+      <a href="mailto:veerakarthick609@gmail.com" class="btn btn-ghost">Get in touch</a>
+    </div>
+  </div>
+  <div class="hero-scroll-hint">scroll</div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="sec">
+  <div class="sec-inner">
+    <div class="sec-label r">about</div>
+    <div class="about-grid">
+      <div class="about-code rl">
+        <div class="code-bar">
+          <div class="cb-dot" style="background:#ff5f57"></div>
+          <div class="cb-dot" style="background:#febc2e"></div>
+          <div class="cb-dot" style="background:#28c840"></div>
+          <span style="font-family:var(--mono);font-size:.58rem;color:var(--sub);margin-left:.6rem">profile.py</span>
+        </div>
+        <div class="code-body">
+          <span class="cl cc"># Veera Karthick</span>
+          <span class="cl">&nbsp;</span>
+          <span class="cl"><span class="ck">class</span> <span class="cx">Engineer</span>:</span>
+          <span class="cl">  <span class="cx">name</span>     = <span class="cs">"Veera Karthick"</span></span>
+          <span class="cl">  <span class="cx">edu</span>      = <span class="cs">"VIT Chennai"</span></span>
+          <span class="cl">  <span class="cx">degree</span>   = <span class="cs">"B.Tech CS – AI & ML"</span></span>
+          <span class="cl">  <span class="cx">cgpa</span>     = <span class="cn">8.46</span></span>
+          <span class="cl">&nbsp;</span>
+          <span class="cl">  <span class="cx">work</span>     = <span class="cs">"Red Augment"</span></span>
+          <span class="cl">  <span class="cx">role</span>     = <span class="cs">"AI Engineer Intern"</span></span>
+          <span class="cl">&nbsp;</span>
+          <span class="cl">  <span class="cx">stack</span>    = [</span>
+          <span class="cl">    <span class="cs">"Python"</span>, <span class="cs">"FastAPI"</span>,</span>
+          <span class="cl">    <span class="cs">"AsyncIO"</span>, <span class="cs">"Redis"</span>,</span>
+          <span class="cl">    <span class="cs">"PyTorch"</span>, <span class="cs">"RAG"</span></span>
+          <span class="cl">  ]</span>
+          <span class="cl">  <span class="cx">open_to_work</span> = <span class="cn">True</span></span>
+        </div>
+      </div>
+      <div class="about-text rr">
+        <p class="about-para">
+          CS undergrad at VIT Chennai, specialising in AI & ML. I spend most of my time building systems that <strong>handle real traffic with real constraints</strong> — low latency, high concurrency, no excuses.
+        </p>
+        <p class="about-para">
+          Currently at <strong>Red Augment</strong> as an AI Engineer intern, productionising RAG pipelines end-to-end. Before that, building side projects across ML inference, crypto automation, and computer vision.
+        </p>
+        <p class="about-para">
+          I care about how systems actually behave under load — not just whether they work in isolation.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience" class="sec">
+  <div class="sec-inner">
+    <div class="sec-label r">experience</div>
+    <div class="exp-list">
+
+      <div class="exp-row r">
+        <div class="exp-time">
+          <span>Jan 2025 — Present</span>
+          Red Augment<br>Remote, India
+        </div>
+        <div class="exp-main">
+          <div class="exp-title">AI Engineer Intern</div>
+          <div class="exp-co">Red Augment</div>
+          <div class="exp-pts">
+            <div class="exp-pt">Productionised a RAG platform serving real users end-to-end — ingestion, retrieval, generation, streaming, and caching.</div>
+            <div class="exp-pt">Reduced LLM calls by 50% via classifier consolidation and rule-based bypass for deterministic intents, cutting 1.5s per request.</div>
+            <div class="exp-pt">Migrated from WSGI to ASGI with a full asyncio refactor, enabling true streaming and significantly higher concurrent throughput.</div>
+            <div class="exp-pt">Batched MongoDB CRUD operations, cutting DB round-trips by 5–6× per request and improving P95 latency.</div>
+            <div class="exp-pt">Implemented async deep-search batching for feature extraction, preventing 10K+ token prompt inflation.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exp-row r" style="transition-delay:.12s">
+        <div class="exp-time">
+          <span>Sep 2022 — Jul 2026</span>
+          VIT Chennai<br>Chennai, India
+        </div>
+        <div class="exp-main">
+          <div class="exp-title">B.Tech — CS, AI & ML</div>
+          <div class="exp-co">Vellore Institute of Technology</div>
+          <div class="exp-pts">
+            <div class="exp-pt">CGPA 8.46 · Specialising in AI and machine learning systems.</div>
+            <div class="exp-pt">Core coursework: DSA, OS, DBMS, Computer Networks, Advanced ML.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" class="sec">
+  <div class="sec-inner">
+    <div class="sec-label r">projects</div>
+    <div class="proj-grid">
+
+      <div class="proj-card r" style="transition-delay:.0s">
+        <div class="pc-num">01</div>
+        <div class="pc-name">SmartBatch</div>
+        <p class="pc-desc">Async dynamic batching engine that aggregates real-time ML inference traffic into GPU-efficient batches. Includes queue-based backpressure, timeout-aware scheduling, and tail-latency balancing for burst traffic.</p>
+        <div class="pc-footer">
+          <div class="pc-tags">
+            <span class="pc-tag">Python</span><span class="pc-tag">FastAPI</span><span class="pc-tag">AsyncIO</span><span class="pc-tag">PyTorch</span>
+          </div>
+          <a href="https://github.com/VeeraKarthick609/SmartBatch" target="_blank" class="pc-link">↗</a>
+        </div>
+      </div>
+
+      <div class="proj-card r" style="transition-delay:.1s">
+        <div class="pc-num">02</div>
+        <div class="pc-name">Spot Hedging Bot</div>
+        <p class="pc-desc">Real-time crypto monitoring system with 1-minute polling across OKX, Bybit, and Deribit. Automated spread tracking and volatility-based risk alerts delivered via Telegram.</p>
+        <div class="pc-footer">
+          <div class="pc-tags">
+            <span class="pc-tag">Python</span><span class="pc-tag">ARIMA</span><span class="pc-tag">REST APIs</span><span class="pc-tag">Telegram</span>
+          </div>
+          <a href="https://github.com/VeeraKarthick609/spot_hedging_bot" target="_blank" class="pc-link">↗</a>
+        </div>
+      </div>
+
+      <div class="proj-card r" style="transition-delay:.05s">
+        <div class="pc-num">03</div>
+        <div class="pc-name">ImageCaptioner</div>
+        <p class="pc-desc">Automated image captioning pipeline using vision-language models. Generates natural language descriptions from raw image inputs, built for scalable batch inference.</p>
+        <div class="pc-footer">
+          <div class="pc-tags">
+            <span class="pc-tag">PyTorch</span><span class="pc-tag">Transformers</span><span class="pc-tag">Vision-LM</span>
+          </div>
+          <a href="https://github.com/VeeraKarthick609/ImageCaptioner" target="_blank" class="pc-link">↗</a>
+        </div>
+      </div>
+
+      <div class="proj-card r" style="transition-delay:.15s">
+        <div class="pc-num">04</div>
+        <div class="pc-name">ViT Image Search</div>
+        <p class="pc-desc">Semantic image search engine powered by Vision Transformers. Extracts dense visual embeddings for similarity-based retrieval across large image corpora.</p>
+        <div class="pc-footer">
+          <div class="pc-tags">
+            <span class="pc-tag">ViT</span><span class="pc-tag">Embeddings</span><span class="pc-tag">PyTorch</span><span class="pc-tag">FAISS</span>
+          </div>
+          <a href="https://github.com/VeeraKarthick609/ViT_image_search" target="_blank" class="pc-link">↗</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills" class="sec">
+  <div class="sec-inner">
+    <div class="sec-label r">skills</div>
+    <div class="skills-grid">
+      <div>
+        <div class="skill-block r" style="transition-delay:.0s">
+          <div class="sb-cat">Languages</div>
+          <div class="sb-pills">
+            <span class="sb-pill">Python</span>
+            <span class="sb-pill">Go</span>
+            <span class="sb-pill">SQL</span>
+          </div>
+        </div>
+        <div class="skill-block r" style="transition-delay:.08s">
+          <div class="sb-cat">Backend & Infra</div>
+          <div class="sb-pills">
+            <span class="sb-pill">FastAPI</span>
+            <span class="sb-pill">Django</span>
+            <span class="sb-pill">AsyncIO</span>
+            <span class="sb-pill">Redis</span>
+            <span class="sb-pill">Docker</span>
+            <span class="sb-pill">CI/CD</span>
+          </div>
+        </div>
+        <div class="skill-block r" style="transition-delay:.16s">
+          <div class="sb-cat">Databases</div>
+          <div class="sb-pills">
+            <span class="sb-pill">MongoDB</span>
+            <span class="sb-pill">MySQL</span>
+          </div>
+        </div>
+        <div class="skill-block r" style="transition-delay:.24s">
+          <div class="sb-cat">AI / ML</div>
+          <div class="sb-pills">
+            <span class="sb-pill">PyTorch</span>
+            <span class="sb-pill">TensorFlow</span>
+            <span class="sb-pill">Transformers</span>
+            <span class="sb-pill">RAG</span>
+            <span class="sb-pill">Graph-RAG</span>
+            <span class="sb-pill">ViT</span>
+            <span class="sb-pill">ARIMA</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rr">
+        <div class="sb-cat" style="margin-bottom:2rem">Proficiency</div>
+        <div class="bars" id="bars">
+          <div class="bar-row">
+            <div class="bar-head"><span class="bar-name">Python</span><span class="bar-val">Expert</span></div>
+            <div class="bar-track"><div class="bar-fill" data-w="92"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-head"><span class="bar-name">FastAPI / AsyncIO</span><span class="bar-val">Strong</span></div>
+            <div class="bar-track"><div class="bar-fill" data-w="87"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-head"><span class="bar-name">PyTorch / ML</span><span class="bar-val">Strong</span></div>
+            <div class="bar-track"><div class="bar-fill" data-w="82"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-head"><span class="bar-name">Redis / Databases</span><span class="bar-val">Solid</span></div>
+            <div class="bar-track"><div class="bar-fill" data-w="78"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-head"><span class="bar-name">Docker / CI/CD</span><span class="bar-val">Solid</span></div>
+            <div class="bar-track"><div class="bar-fill" data-w="72"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-head"><span class="bar-name">Go</span><span class="bar-val">Learning</span></div>
+            <div class="bar-track"><div class="bar-fill" data-w="55"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="sec">
+  <div class="sec-inner">
+    <div class="sec-label r">contact</div>
+    <div class="contact-grid">
+      <div class="rl">
+        <h2 class="contact-heading">Let's build<br><em>something.</em></h2>
+        <p class="contact-note">Open to full-time roles, internships, and interesting problems in AI systems or backend engineering. If something looks interesting, just reach out.</p>
+        <div class="contact-items">
+          <a href="mailto:veerakarthick609@gmail.com" class="ci">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            veerakarthick609@gmail.com
+          </a>
+          <a href="https://linkedin.com/in/veera-karthick-700158225" target="_blank" class="ci">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+            linkedin.com/in/veera-karthick-700158225
+          </a>
+          <a href="https://github.com/VeeraKarthick609" target="_blank" class="ci">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            github.com/VeeraKarthick609
+          </a>
+        </div>
+      </div>
+      <div class="form rr">
+        <div class="fg">
+          <label class="fl">Name</label>
+          <input type="text" class="fi" placeholder="Your name">
+        </div>
+        <div class="fg">
+          <label class="fl">Email</label>
+          <input type="email" class="fi" placeholder="your@email.com">
+        </div>
+        <div class="fg">
+          <label class="fl">Message</label>
+          <textarea class="ft" placeholder="What's on your mind?"></textarea>
+        </div>
+        <button class="fsub">Send</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 <span>Veera Karthick</span></p>
+  <p>Chennai, India · <span>open to work</span></p>
+</footer>
+
+<script>
+// cursor
+const c = document.getElementById('c');
+const cr = document.getElementById('cr');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  c.style.left = mx + 'px'; c.style.top = my + 'px';
+});
+(function loop() {
+  rx += (mx - rx) * .13; ry += (my - ry) * .13;
+  cr.style.left = rx + 'px'; cr.style.top = ry + 'px';
+  requestAnimationFrame(loop);
+})();
+
+// scroll reveal
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('v'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+document.querySelectorAll('.r, .rl, .rr').forEach(el => io.observe(el));
+
+// skill bars
+const bio = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.bar-fill').forEach(b => {
+        setTimeout(() => b.style.width = b.dataset.w + '%', 100);
+      });
+      bio.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+bio.observe(document.getElementById('bars'));
+</script>
+</body>
+</html>
